@@ -1,0 +1,81 @@
+[%- WRAPPER 'layout.tt' title=l('Make a Donation with WePay') %]
+<h1>[% l('Make a Donation with WePay') %]</h1>
+  <p>
+    [% l('To make a WePay donation, please verify the amount below. If you
+          wish to credit this donation to a particular MusicBrainz user,
+          please fill in the user name as well.') %]
+  </p>
+
+  <p>
+    [% l('The personal information provided to the MetaBrainz Foundation during
+          the donation process will not be shared with anyone. For more
+          information, please take a look at our {doc|privacy policy}.',
+          { doc => doc_link('Privacy_Policy') }) %]
+  </p>
+
+
+  <p><strong>
+    [% l('You must enter your MusicBrainz user name below to have
+          Picard/MusicBrainz stop nagging you.') %]
+  </strong></p>
+
+  <form action="" method="post">
+    [% IF form.has_errors %]
+    <p style="font-weight: bold">
+      [% l('It seems that your form submission has some errors. Please double
+            check the information below and try again.') %]
+    </p>
+    <ul>
+      [%- FOR error=form.errors -%]
+      <li>[% error %]</li>
+      [%- END -%]
+    </ul>
+    [% END %]
+
+    <div class="row">
+      <label for="[% form.field('amount').id %]">[% l('Amount:') %]</label>
+      <input type="text" id="[% form.field('amount').id %]"
+             name="[% form.field('amount').html_name %]"
+             value="[% form.field('amount').value %]" size="10"> USD
+      [% IF recur %]<strong>[% l('per month') %]</strong>[% END %]
+      <input type="hidden" name="[% form.field('recur').html_name %]" value="[% form.field('recur').value %]" />
+      [% field_errors(form.field('amount')) %]
+    </div>
+
+    <div class="row">
+      <label for="[% form.field('editor').id %]">[% l('User name:') %]</label>
+      <input type="text" id="[% form.field('editor').id %]"
+                         name="[% form.field('editor').html_name %]"
+                         value="[% form.field('editor').value %]" size="20" />
+      [% l('(required to stop being nagged)') %]
+      [% field_errors(form.field('editor')) %]
+    </div>
+
+    <div class="row no-label">
+      <input type="checkbox" id="[% form.field('can_contact').id %]"
+                             name="[% form.field('can_contact').html_name %]" 
+                             [% IF form.field('can_contact').value %]checked="checked"[% END %]/>
+      <label class="inline" for="[% form.field('can_contact').id %]">
+        [% l('You may email me about future fundraising events (this will be very seldom)') %]
+      </label>
+      [% field_errors(form.field('can_contact')) %]
+    </div>
+
+    <div class="row no-label">
+      <input type="checkbox" id="[% form.field('anonymous').id %]"
+                             name="[% form.field('anonymous').html_name %]"
+                             [% IF form.field('anonymous').value %]checked="checked"[% END %]/>
+      <label class="inline" for="[% form.field('anonymous').id %]">
+        [% l('I would like this donation to be anonymous (don\'t
+              list my name on the finances page)') %]
+      </label>
+      [% field_errors(form.field('anonymous')) %]
+    </div>
+
+    <div class="row no-label">
+      <input type="image" src="[% c.uri_for('/static/images/wepay-donate.png') %]"
+             style="border: 0" name="submit" alt="[% l('Donate with WePay') %]"
+             title="[% l('Donate!') %]" />
+    </div>
+  </form>
+[% END %]

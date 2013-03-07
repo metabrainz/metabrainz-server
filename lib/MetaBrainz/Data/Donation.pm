@@ -157,7 +157,7 @@ sub verify_paypal_transaction {
     }
 }
 
-sub try_log_donation {
+sub try_log_paypal_donation {
     my ($self, $params) = @_;
 
     # check that $txn_id has not been previously processed
@@ -171,7 +171,7 @@ sub try_log_donation {
         LogTransaction("not primary email");
     }
 
-    elsif ($params->{payer_email} =~ /^yewm200/ || $params->{payer_email} eq 'gypsy313309496@aol.com')
+    elsif (_is_blocked_email($params->{payer_email}))
     {
         LogTransaction("blocked donor");
     }
@@ -186,7 +186,7 @@ sub try_log_donation {
     {
         $self->sql->begin;
 
-	$params->{mc_fee} = 0.0 if (!exists $params->{mc_fee});
+        $params->{mc_fee} = 0.0 if (!exists $params->{mc_fee});
         warn Dumper($params);
         $self->sql->insert_row('donation', {
             first_name       => $params->{first_name},
@@ -226,6 +226,91 @@ sub try_log_donation {
     else
     {
         LogTransaction("Other status (no error)");
+    }
+}
+
+sub verify_and_log_wepay_checkout {
+    my ($self, $checkout_id, $editor, $anonymous, $contact) = @_;
+
+    if ($self->get_by_transaction_id($checkout_id)) {
+        LogTransaction("wepay checkout ID already processed");
+    } else {
+        my $url = 'https://wepayapi.com/v2/';
+        if (DBDefs::WEPAY_USE_STAGING) {
+            $url = 'https://stage.wepayapi.com/v2/';
+        }
+
+        my $content = { checkout_id => $checkout_id };
+        my $ua = LWP::UserAgent->new(agent => 'metabrainz-server');
+        my $checkout = $ua->post($url . '/checkout/',
+                                 'Authorization' => 'Bearer ' . DBDefs::WEPAY_ACCESS_TOKEN,
+                                 Content => $content);
+        my $data = JSON->new->utf8->decode($checkout->content);
+
+        if ($data->{error}) {
+            LogTransaction("wepay donation error: " . $data->{error_description});
+            return 0;
+        } else {
+            my $state = lc($data->{state});
+            if (defined $data->{payer_email} && _is_blocked_email($data->{payer_email})) {
+                LogTransaction("blocked donor");
+            }
+            elsif ($data->{gross} < 0.50)
+            {
+                LogTransaction("Tiny donation");
+            }
+            elsif ($state eq 'settled' || $state eq 'captured') {
+                $self->sql->begin;
+
+                warn Dumper($data);
+                $self->sql->insert_row('donation', {
+                    first_name       => $data->{payer_name},
+                    last_name        => '',
+                    email            => $data->{payer_email},
+                    moderator        => $editor,
+                    contact          => $contact ? 'y' : 'n',
+                    anon             => $anonymous ? 'y' : 'n',
+                    address_street   => $data->{shipping_address} ? $data->{shipping_address}{address1} . "\n" . $data->{shipping_address}{address2} : "",
+                    address_city     => $data->{shipping_address} ? $data->{shipping_address}{city} : "",
+                    address_state    => $data->{shipping_address} ? ($data->{shipping_address}{state} ? $data->{shipping_address}{state} : $data->{shipping_address}{region}) : "",
+                    address_postcode => $data->{shipping_address} ? ($data->{shipping_address}{zip} ? $data->{shipping_address}{zip} : $data->{shipping_address}{postcode}) : "",
+                    address_country  => $data->{shipping_address} ? $data->{shipping_address}{country} : "",
+                    paypal_trans_id  => $checkout_id,
+                    amount           => $data->{gross} - $data->{fee},
+                    fee              => $data->{fee}
+                });
+
+                $self->c->model('Receipt')->mail_donation_receipt(
+                    $self->get_by_transaction_id($checkout_id)
+                );
+                $self->sql->commit;
+
+                LogTransaction("payment received");
+            }
+            elsif ($state eq 'authorized' || $state eq 'reserved')
+            {
+                LogTransaction("payment pending");
+            }
+            elsif ($state eq 'expired' || $state eq 'cancelled' || $state eq 'failed' || $state eq 'refunded' || $state eq 'chargeback')
+            {
+                LogTransaction("payment failed with state " . $state);
+            }
+
+            else
+            {
+                LogTransaction("Other status (no error)");
+            }
+            return 1;
+        }
+    }
+}
+
+sub _is_blocked_email {
+    my $email = $_;
+    if ($email =~ /^yewm200/ || $email eq 'gypsy313309496@aol.com') {
+        return 1;
+    } else {
+        return 0;
     }
 }
 

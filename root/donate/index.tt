@@ -1,25 +1,23 @@
-[%- MACRO paypal_donation(value) BLOCK -%]
+[%- MACRO paypal_donation(value, recur) BLOCK -%]
       <td align="center" width="16%">
-        <a href="[% c.uri_for_action('/donate/paypal', { amount => value }) %]"><img src="[% c.uri_for('/static/images/paypal.gif') %]" /></a>
-        <br />
-        [%= IF value==0 =%]
-          $Other
-        [%= ELSE =%]
-          $[%= value =%]
-        [%= END =%]
+        <a href="[% c.uri_for_action('/donate/paypal', { amount => value, recur => recur }) %]"><img src="[% c.uri_for('/static/images/paypal-logo.png') %]" /></a>
       </td>
 [%- END -%]
-
-[%- MACRO paypal_donation_recur(value, recur) BLOCK -%]
+[%- MACRO wepay_donation(value, recur) BLOCK -%]
       <td align="center" width="16%">
-        <a href="[% c.uri_for_action('/donate/paypal', { amount => value, recur => recur }) %]"><img src="[% c.uri_for('/static/images/paypal.gif') %]" /></a>
-        <br />
-        [%= IF value==0 =%]
-          $Other/month
-        [%= ELSE =%]
-          $[%= value =%]/month
-        [%= END =%]
+        <a href="[% c.uri_for_action('/donate/wepay', { amount => value, recur => recur }) %]">
+          <img style="vertical-align: middle" src="[% c.uri_for('/static/images/wepay-logo.png') %]" />
+        </a>
       </td>
+[%- END -%]
+[%- MACRO dollars(value, recur) BLOCK -%]
+    <td align="center" width="16%">
+    [%= IF value==0 =%]
+      $Other[% IF recur %]/month[% END %]
+    [%= ELSE =%]
+      $[%= value =%][% IF recur %]/month[% END %]
+    [%= END =%]
+    </td>
 [%- END -%]
 
 [%- WRAPPER 'layout.tt' title=l('Make a Donation') %]
@@ -44,61 +42,76 @@
   <p>[% l('Who else is contributing? See our list of {uri|donors}.',
   { uri => c.uri_for_action('/donations/by_date') }) %]</p>
 
-  <div style="float: left">
+  <h2>[% l('Donate with PayPal or WePay') %]</h2>
+  <p>[% l('To send money via PayPal or WePay, please use one of the
+  convenient buttons below:') %]</p>
 
-      <h2>[% l('Donating with PayPal') %]</h2>
-      <p>[% l('To send money via PayPal, please use one of the
-      convenient buttons below:') %]</p>
+  <table width="100%">
+    <tr>
+      [% paypal_donation(10, 0) %]
+      [% paypal_donation(25, 0) %]
+      [% paypal_donation(50, 0) %]
+      [% paypal_donation(100, 0) %]
+      [% paypal_donation(500, 0) %]
+      [% paypal_donation(0, 0) %]
+    </tr>
+    <tr>
+      [% wepay_donation(10, 0) %]
+      [% wepay_donation(25, 0) %]
+      [% wepay_donation(50, 0) %]
+      [% wepay_donation(100, 0) %]
+      [% wepay_donation(500, 0) %]
+      [% wepay_donation(0, 0) %]
+    </tr>
+    <tr>
+      [% dollars(10, 0) %]
+      [% dollars(25, 0) %]
+      [% dollars(50, 0) %]
+      [% dollars(100, 0) %]
+      [% dollars(500, 0) %]
+      [% dollars(0, 0) %]
+    </tr>
+  </table>
 
-      <table width="100%">
-        <tr>
-          [% paypal_donation(10, 0) %]
-          [% paypal_donation(25, 0) %]
-          [% paypal_donation(50, 0) %]
-        </tr>
-        <tr>
-          [% paypal_donation(100, 0) %]
-          [% paypal_donation(500, 0) %]
-          [% paypal_donation(0, 0) %]
-        </tr>
-      </table>
+  <p>[% l('To set up a recurring monthly donation, use the buttons below:') %]</p>
 
-      <p>[% l('To set up a recurring monthly donation, use the buttons below:') %]</p>
+  <table width="100%">
+    <tr>
+      [% paypal_donation(10, 1) %]
+      [% paypal_donation(25, 1) %]
+      [% paypal_donation(50, 1) %]
+      [% paypal_donation(100, 1) %]
+      [% paypal_donation(500, 1) %]
+      [% paypal_donation(0, 1) %]
+    </tr>
+    <tr>
+      [% wepay_donation(10, 1) %]
+      [% wepay_donation(25, 1) %]
+      [% wepay_donation(50, 1) %]
+      [% wepay_donation(100, 1) %]
+      [% wepay_donation(500, 1) %]
+      [% wepay_donation(0, 1) %]
+    </tr>
+    <tr>
+      [% dollars(10, 1) %]
+      [% dollars(25, 1) %]
+      [% dollars(50, 1) %]
+      [% dollars(100, 1) %]
+      [% dollars(500, 1) %]
+      [% dollars(0, 1) %]
+    </tr>
+  </table>
 
-      <table width="100%">
-        <tr>
-          [% paypal_donation_recur(10, 1) %]
-          [% paypal_donation_recur(20, 1) %]
-          [% paypal_donation_recur(30, 1) %]
-        </tr>
-        <tr>
-          [% paypal_donation_recur(50, 1) %]
-          [% paypal_donation_recur(100, 1) %]
-          [% paypal_donation_recur(0, 1) %]
-        </tr>
-      </table>
+  <h2>[% l('Donating money in other ways') %]</h2>
 
-      <h2>[% l('Donating money in other ways') %]</h2>
+  <p>[% l('If you would like to donate cash using a check or a bank draft, please send them
+  to:') %]</p>
 
-      <p>[% l('If you would like to donate cash using a check or a bank draft, please send them
-      to:') %]</p>
+  <p>MetaBrainz Foundation<br />
+  3565 South Higuera St, Suite B<br />
+  San Luis Obispo, CA 93401<br />
+  United States</p>
 
-      <p>MetaBrainz Foundation<br />
-      3565 South Higuera St, Suite B<br />
-      San Luis Obispo, CA 93401<br />
-      United States</p>
-
-      <p>[% l('Please make checks payable to the <strong>MetaBrainz Foundation</strong>') %].</p>
-
-  </div>
-
-  <div style="float: right">
-      <h2>[% l('Donating with WePay') %]</h2>
-      <p>
-      <a class="wepay-widget" href="https://www.wepay.com/donations/145963?widget_type=donations&widget_donation_id=145963&widget_auth_token=3189d11b35fa5728a304efc138063a609700e4ca&widget_show_description=0&widget_show_thermometer=0&widget_show_donations=1">Donate to MusicBrainz Donations<script id="wepay-widget_script" type="text/javascript" src="https://www.wepay.com/min/js/widget.wepay.js"></script></a>
-      </p>
-
-  </div>
-  <div style="clear: both"></div>
+  <p>[% l('Please make checks payable to the <strong>MetaBrainz Foundation</strong>') %].</p>
 
 [% END %]

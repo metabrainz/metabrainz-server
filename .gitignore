@@ -6,3 +6,4 @@ lib/DBDefs.pm
 /local
 /.carton
 musicbrainz-server
+*~

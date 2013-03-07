@@ -10,6 +10,10 @@ MusicBrainz::Server::DatabaseConnectionFactory->register_databases(
         database    => "metabrainz",
         schema      => "public",
         username    => "musicbrainz",
+    },
+    SYSTEM => {
+        database    => "template1",
+        username    => "postgres",
     }
 );
 
@@ -55,5 +59,12 @@ sub PAYPAL_PRIMARY_EMAIL { 'paypal@metabrainz.org' }
 sub PAYPAL_BUSINESS { 'payment@metabrainz.org' }
 
 sub MAX_REQUEST_TIME { 30 }
+
+# From WePay's application page, after creating an API application
+sub WEPAY_ACCESS_TOKEN { '' }
+# This should just be the number in the URL when you're logged in as the merchant
+sub WEPAY_ACCOUNT_ID { '' }
+# Use WePay's staging server
+sub WEPAY_USE_STAGING { 1 }
 
 1;

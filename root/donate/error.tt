@@ -1,0 +1,4 @@
+[% WRAPPER 'layout.tt' title=l('Donation Error') %]
+  <p>[% l('We\'re sorry, but it appears we\'ve run into an unexplained error and can\'t process your donation.') %]</p>
+  [% IF message %]<p>[% l('If it helps, here\'s what we know:') %] [% message | html %]</p>[% END %]
+[% END %]

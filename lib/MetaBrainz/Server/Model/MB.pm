@@ -4,6 +4,7 @@ use Moose;
 extends 'Catalyst::Model';
 
 use aliased 'MusicBrainz::Server::DatabaseConnectionFactory';
+use DBDefs;
 
 use MetaBrainz::Context;
 
@@ -21,6 +22,14 @@ sub _build_context {
         conn => DatabaseConnectionFactory->get_connection('METABRAINZ'),
         cache_manager => MusicBrainz::Server::CacheManager->new(
             profiles => {
+                external => {
+                    class => 'Cache::Memcached::Fast',
+                    keys => [qw( wikidoc wikidoc-index )],
+                    options => {
+                        servers => DBDefs::MEMCACHED_SERVERS(),
+                        namespace => "metabrainz:"
+                    },
+                },
                 null => {
                     class => 'Cache::Null',
                     wrapped => 1,

@@ -67,4 +67,6 @@ sub WEPAY_ACCOUNT_ID { '' }
 # Use WePay's staging server
 sub WEPAY_USE_STAGING { 1 }
 
+sub MEMCACHED_SERVERS { return ['127.0.0.1:11211'] }
+
 1;

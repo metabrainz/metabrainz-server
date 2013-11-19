@@ -38,7 +38,7 @@ server {
 	location = /robots.txt {
 		root /home/metabrainz/metabrainz-server/root;
 		default_type text/plain;
-		try_files	$uri;
+		try_files $uri =404;
 		expires	1h;
 	}
 

@@ -104,8 +104,10 @@
 
   <h2>[% l('Donating Bitcoins') %]</h2>
 
-  If you would like to make a donation to us in bitcoins, please use this address: <em>1Pc7sFnuRfDQ2rGoNwRA3nBX1Pqjjqb15v</em>
-
+  <p>
+     If you would like to make a donation to us in bitcoins, please use this address:</br>
+     <em style="margin-left: 2em">1Pc7sFnuRfDQ2rGoNwRA3nBX1Pqjjqb15v</em>
+  </p>
 
   <h2>[% l('Donating money in other ways') %]</h2>
 

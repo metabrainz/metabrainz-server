@@ -5,7 +5,7 @@ import decimal
 
 senderPayPalMoneyMarket = 'PayPal - Money Market'
 senderBankAccount = 'Bank Account'
-taggerCustomers = ("JThink ltd",
+taggerCustomers = ("2ManyRobots",
                    "Mathias Kunter")
 taggerAccount = "Income - Affiliate - Tagger"
 
@@ -22,6 +22,7 @@ expenseAccounts = ("Expense - Hosting - DWNI",
                    "Expense - Gifts",
                    "Expense - Events",
                    "Expense - Software",
+                   "Expense - Community Management",
                    "Income - Donations - PayPal") 
 
 incomeAccountDonation = 0
@@ -32,6 +33,7 @@ incomeAccounts = ("Income - Donations - PayPal",
                   "Expense - Hardware",
                   "Expense - Gifts",
                   "Expense - Marketing",
+                  "Expense - Internet",
                   "Expense - Travel",
                   "Expense - Software",
                   "Expense - Bank - PayPal",
